@@ -7,3 +7,4 @@ test.csv
 train.csv
 transactions.csv
 .ipynb_checkpoints/
+*.csv
