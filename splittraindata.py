@@ -5,7 +5,7 @@ import numpy as np
 unitsales = pd.read_csv('train.csv', low_memory=False)
 #transactions = pd.read_csv('transactions_clean.csv')
 
-unitsales.drop('onpromotion', axis=1, inplace=True)
+#unitsales.drop('onpromotion', axis=1, inplace=True)
 unitsales.drop('id', axis=1, inplace=True)
 
 # Get list of item numbers
