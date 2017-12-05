@@ -11,7 +11,7 @@ def clean(item):
 
 df_list = []
 
-for index, row in itemlist.iterrows():
+for  index, row in itemlist.iterrows():
     item = int(row[0])
     df_list.append(clean(item))
 
