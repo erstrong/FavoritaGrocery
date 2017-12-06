@@ -3,7 +3,6 @@ import numpy as np
 import datetime
 
 # Read Data Files
-transactions = pd.read_csv('transactions_clean.csv')
 stores = pd.read_csv('stores.csv', header=0)
 transactions = pd.read_csv('transactions_clean.csv', header=0)
 items = pd.read_csv('items.csv', header=0)
