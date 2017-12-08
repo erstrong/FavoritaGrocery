@@ -11,7 +11,7 @@ oil = pd.read_csv('../data/oils_clean.csv', header=0)
 
 # Get list of item numbers
 itemlist = pd.read_csv('itemlist.csv', header=None)
-
+#itemlist = pd.read_csv('itemlist4.csv', header=None)
 
 # Preprocessing
 holidays = holidays.rename(columns={'date':'date','type':'holidaytype','locale':'locale','locale_name':'locale_name',
@@ -52,7 +52,7 @@ def holiday2(x, y, z):
         return 'None'
 
 def trans(x, y, z):
-    if (x or y or z):
+    if (x==True or y==True or z==True):
         return 1
     else:
         return 0
@@ -128,6 +128,7 @@ def featureengineer(unitsales):
     unitsales['net_tranferred'] = unitsales.apply(lambda x: trans(x['transferred_n'], x['transferred_r'], x['transferred']), axis=1)
     
     # Drop unnecessary features
+    untisales.drop('id', axis=1, inplace=True)
     unitsales.drop('date', axis=1, inplace=True)
     unitsales.drop('transferred', axis=1, inplace=True)
     unitsales.drop('transferred_n', axis=1, inplace=True)
@@ -136,6 +137,9 @@ def featureengineer(unitsales):
     unitsales.drop('locale_r', axis=1, inplace=True)
     unitsales.drop('locale', axis=1, inplace=True)
     unitsales.drop('locale_name', axis=1, inplace=True)
+    unitsales.drop('holidaytype', axis=1, inplace=True)
+    unitsales.drop('holidaytype_n', axis=1, inplace=True)
+    unitsales.drop('holidaytype_r', axis=1, inplace=True)
     
     # Remove outliers
     unitsales = unitsales[unitsales['unit_sales']<1000]

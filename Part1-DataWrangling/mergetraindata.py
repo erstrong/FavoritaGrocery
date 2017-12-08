@@ -23,8 +23,8 @@ output = pd.concat(df_list)
 print('writing full csv')
 output.to_csv('train_finalclean.csv', index=False)
 
-print('writing sample csv')
-eda=output.sample(n=1000000)
-eda.to_csv('train_SampleForEDA.csv', index=False)
+#print('writing sample csv')
+#eda=output.sample(n=1000000)
+#eda.to_csv('train_SampleForEDA.csv', index=False)
 
 print('Success!')
