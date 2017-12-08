@@ -12,8 +12,9 @@ class cleanOilData(luigi.Task):
 		oils.set_index('date', inplace=True)
 		oils = oils.resample('D').mean().reset_index()
 		oils=oils.interpolate(method='linear').bfill().ffill()
-		oils.to_csv('oils_clean.csv', index=False)
+		oils.to_csv(self.output().path,index=False)
 	def output(self):
+		return luigi.LocalTarget('oils_clean.csv')
 	
 class cleanTransactionsData(luigi.Task):
 	def run(self):
@@ -105,45 +106,22 @@ class cleanTransactionsData(luigi.Task):
 		t53['53'] = t53['53'].interpolate(method='linear').bfill().ffill()
 		flattened['53'] = t53['53']
 
-		flattened.to_csv('transactions_clean.csv', index=False)
+		flattened.to_csv(self.output().path,index=False)
 	def output(self):
+		return luigi.LocalTarget('transactions_clean.csv')
 	
-	
-class splitTrainData(luigi.Task):
-	def run(self):
-	unitsales = pd.read_csv('train.csv', low_memory=False)
-#transactions = pd.read_csv('transactions_clean.csv')
-
-#unitsales.drop('onpromotion', axis=1, inplace=True)
-		unitsales.drop('id', axis=1, inplace=True)
-
-# Get list of item numbers
-		itemlist = unitsales.item_nbr.unique()
-		np.savetxt("itemlist.csv", itemlist, delimiter=",")
-
-
-
-		def split(item):
-			df = unitsales[unitsales['item_nbr']==item]
-			file = 'items/' + str(item) + '.csv'
-			df.to_csv(file, index=False)
-
-		for item in itemlist:
-			split(item)
-	def output(self):
-
 class cleanTrainData(luigi.Task):
 	def requires(self):
+		yield cleanOilData()
+		yield cleanTransactionsData()
 	def run(self):
-		transactions = pd.read_csv('transactions_clean.csv')
+		unitsales = pd.read_csv('train.csv', header=0, low_memory=False)
 		stores = pd.read_csv('stores.csv', header=0)
-		transactions = pd.read_csv('transactions_clean.csv', header=0)
+		transactions = pd.read_csv(cleanTransactionsData().output().path, encoding = "ISO-8859-1", header=0)
 		items = pd.read_csv('items.csv', header=0)
 		holidays = pd.read_csv('holidays_events.csv', header=0)
-		oil = pd.read_csv('oils_clean.csv', header=0)
+		oil = pd.read_csv(cleanOilData().output().path, encoding = "ISO-8859-1", header=0)
 
-# Get list of item numbers
-		itemlist = pd.read_csv('itemlist.csv', header=None)
 
 
 # Preprocessing
@@ -161,66 +139,36 @@ class cleanTrainData(luigi.Task):
 		transactions = transactions.rename(columns={'date':'date','variable':'store_nbr','value':'transactions'})
 		transactions['store_nbr'] = transactions['store_nbr'].map(lambda x: int(x))
 
+# Clean the training data
+		unitsales.drop('id', axis=1, inplace=True)
+		unitsales['onpromotion'].fillna(False, inplace=True)
 
+# Remove outliers
+		unitsales = unitsales[unitsales['unit_sales']<1000]
+		unitsales = unitsales[unitsales['unit_sales']>-1000]
 
-		def clean(item):
-			print(str(item))
-			filename= 'items/'+ str(item) + '.csv'
-			df = pd.read_csv(filename)
-			df['onpromotion'].fillna(False, inplace=True)
-    # Combine with other files
-			df = df.merge(items, on='item_nbr', how='left')
-			df = df.merge(stores, on='store_nbr', how='left')
-    #df = df['store_nbr'].map(lambda a: int(a))
-			df = df.merge(transactions, how='left', on=['date','store_nbr'])
-			df = df.merge(oil, how='left', on='date')
-			df = df.merge(nationalholidays, on='date', how='left')
-			df = df.merge(regionalholidays, on=['date','state'], how='left', suffixes=('_n','_r'))
-			df = df.merge(localholidays, on=['date','city'], how='left')
-    # Convert date to datetime
-			format = '%Y-%m-%d'
-			df['date'] = df['date'].map(lambda a: datetime.datetime.strptime(a, format))
-			df['day'] = df['date'].map(lambda x: x.weekday())
-			df['month'] = df['date'].map(lambda x: x.month)
-			df['year'] = df['date'].map(lambda x: x.year)
-			df.to_csv('mergeitems/'+ str(item) + '.csv', index=False)
+# Combine with other files
+		unitsales = unitsales.merge(items, on='item_nbr', how='left')
+		unitsales = unitsales.merge(stores, on='store_nbr', how='left')
+		unitsales['store_nbr'] = unitsales['store_nbr'].map(lambda a: int(a))
+		unitsales = unitsales.merge(transactions, how='left', on=['date','store_nbr'])
+		unitsales = unitsales.merge(oil, how='left', on='date')
+		unitsales = unitsales.merge(nationalholidays, on='date', how='left')
+		unitsales = unitsales.merge(regionalholidays, on=['date','state'], how='left', suffixes=('_n','_r'))
+		unitsales = unitsales.merge(localholidays, on=['date','city'], how='left')
 
-
-
-		for index, row in itemlist.iterrows():
-			item = int(row[0])
-			clean(item)
-	def output(self):
+# Convert date to datetime
+		format = '%Y-%m-%d'
+		unitsales['date'] = unitsales['date'].map(lambda a: datetime.datetime.strptime(a, format))
+		unitsales['day'] = unitsales['date'].map(lambda x: x.weekday())
+		unitsales['month'] = unitsales['date'].map(lambda x: x.month)
+		unitsales['year'] = unitsales['date'].map(lambda x: x.year)
 	
-class mergeTrainData(luigi.Task):
-	def requires(self):
-		yield cleanTrainData()
-	def run(self):
-		# Get list of item numbers
-		itemlist = pd.read_csv('itemlist.csv', header=None)
-
-# Read item csvs into a list of dataframes
-		def clean(item):
-			print(str(item))
-			filename= 'mergeitems/'+ str(item) + '.csv'
-			return pd.read_csv(filename, header=0, low_memory=False)
-
-		df_list = []
-
-		for  index, row in itemlist.iterrows():
-			item = int(row[0])
-			df_list.append(clean(item))
-
-# Concatenate the dataframes
-		print('creating dataframe')
-		output = pd.concat(df_list)
-
-# Write output csvs
-		print('writing full csv')
-		output.to_csv(self.output().path,index=False)
+# Write file
+		unitsales.to_csv(self.output().path,index=False)
 	
 	def output(self):
-		return luigi.LocalTarget('train_SampleForEDA.csv')
+		return luigi.LocalTarget('train_finalclean.csv')
 	
 if __name__=='__main__':
 	luigi.run()
