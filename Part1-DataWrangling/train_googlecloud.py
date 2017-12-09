@@ -22,17 +22,14 @@ holidays = holidays.rename(columns={'date':'date','type':'holidaytype','locale':
                            'description':'description','transferred':'transferred'})
 
 holidays.drop('transferred', axis=1, inplace=True)
-nationalholidays = holidays[holidays['locale']=='National'].drop('locale', axis=1, inplace=True)
-nationalholidays.drop('locale_name', axis=1, inplace=True)
+
+nationalholidays = holidays[holidays['locale']=='National'].drop('locale', axis=1).drop('locale_name', axis=1)
+
+regionalholidays = holidays[holidays['locale']=='Regional'].drop('locale', axis=1).drop('description', axis=1)
+localholidays = holidays[holidays['locale']=='Local'].drop('locale', axis=1).drop('description', axis=1)
+
 nationalholidays = nationalholidays.rename(columns={'date':'date','type':'holidaytype','description_n':'description'})
-
-regionalholidays = holidays[holidays['locale']=='Regional'].drop('locale', axis=1, inplace=True)
-localholidays = holidays[holidays['locale']=='Local'].drop('locale', axis=1, inplace=True)
-
-localholidays.drop('description', axis=1, inplace=True)
 localholidays = localholidays.rename(columns={'date':'date','holidaytype':'holidaytype','locale_name':'city'})
-
-regionalholidays.drop('description', axis=1, inplace=True)
 regionalholidays = regionalholidays.rename(columns={'date':'date','holidaytype':'holidaytype','locale_name':'state'})
 
 # transactions
