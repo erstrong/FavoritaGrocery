@@ -3,12 +3,12 @@ import numpy as np
 import datetime
 
 # Read Data Files
-unitsales = pd.read_csv('../data/train.csv', low_memory=False)
-stores = pd.read_csv('../data/stores.csv', header=0)
-transactions = pd.read_csv('../data/transactions_clean.csv', header=0)
-items = pd.read_csv('../data/items.csv', header=0)
-holidays = pd.read_csv('../data/holidays_events.csv', header=0)
-oil = pd.read_csv('../data/oils_clean.csv', header=0)
+unitsales = pd.read_csv('train.csv', low_memory=False)
+stores = pd.read_csv('stores.csv', header=0)
+transactions = pd.read_csv('transactions_clean.csv', header=0)
+items = pd.read_csv('items.csv', header=0)
+holidays = pd.read_csv('holidays_events.csv', header=0)
+oil = pd.read_csv('oils_clean.csv', header=0)
 
 
 

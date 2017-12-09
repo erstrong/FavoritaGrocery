@@ -8,7 +8,7 @@ data = pd.read_csv('train_clean.csv')
 kmeanModel = KMeans(n_clusters=10)
 kmeanModel.fit(data)
 
-with open('unitsaleskmeans.pkl', 'wb') as f:
+with open('/home/ec2-user/unitsaleskmeans.pkl', 'wb') as f:
     joblib.dump(kmeanModel, f)
 
 data['label'] = kmeanModel.labels_
