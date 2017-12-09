@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 
 # Read Data Files
-unitsales = pd.read_csv('train.csv', low_memory=False)
+unitsales = pd.read_csv('../data/train.csv', low_memory=False)
 stores = pd.read_csv('../data/stores.csv', header=0)
 transactions = pd.read_csv('../data/transactions_clean.csv', header=0)
 items = pd.read_csv('../data/items.csv', header=0)
@@ -72,6 +72,15 @@ format = '%Y-%m-%d'
 unitsales['date'] = unitsales['date'].map(lambda a: datetime.datetime.strptime(a, format))
 unitsales['day'] = unitsales['date'].map(lambda x: x.weekday())
 unitsales['month'] = unitsales['date'].map(lambda x: x.month)
+
+day = pd.get_dummies(unitsales['day'],prefix='day')
+unitsales = unitsales.join(day)
+unitsales.drop('day', axis=1, inplace=True)
+
+month = pd.get_dummies(unitsales['month'],prefix='month')
+unitsales = unitsales.join(month)
+unitsales.drop('month', axis=1, inplace=True)
+
 
 
 # Feature Engineering
@@ -187,6 +196,6 @@ unitsales.drop('item_nbr', axis=1, inplace=True)
 unitsales.drop('store_nbr', axis=1, inplace=True)
     
 
-
+unitsales.to_csv('train_clean.csv', index=False)
 
 print('Success!')
