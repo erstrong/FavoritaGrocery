@@ -107,7 +107,7 @@ unitsales.drop('holidaytype_r', axis=1, inplace=True)
 
 def nationalother(x):
     list = ['Additional','Bridge','Transfer','Work Day']
-    if (x.isin(list)):
+    if (x in list):
         return 1
     else:
         return 0
@@ -118,7 +118,7 @@ unitsales.drop('holidaytype_n', axis=1, inplace=True)
 
 def nholidayspike(x):
     list=['Dia de Difuntos','Dia del Trabajo','Independencia de Cuenca','Primer dia del ano']
-    if (x.isin(list)):
+    if (x in list):
         return 1
     else:
         return 0
@@ -142,11 +142,8 @@ def blackfriday(x):
 unitsales['blackfriday'] = unitsales.apply(lambda x: blackfriday(x['description_n']), axis=1)
 
 def worldcupspike(x):
-    if (x.str.contains('Final')):
-        return 1
-    elif(x.str.contains('Tercer')):
-        return 1
-    elif(x.str.contains('Ecuador-Suiza')):
+    list=['Mundial de futbol Brasil: Cuartos de Final','Mundial de futbol Brasil: Ecuador-Suiza','Mundial de futbol Brasil: Final','Mundial de futbol Brasil: Octavos de Final','Mundial de futbol Brasil: Tercer y cuarto lugar']
+    if (x in list):
         return 1
     else:
         return 0
@@ -154,20 +151,18 @@ def worldcupspike(x):
 unitsales['worldcupspike'] = unitsales.apply(lambda x: worldcupspike(x['description_n']), axis=1)
 
 def worldcupdrop(x):
-    if (x.str.contains('Inauguracion')):
-        return 1
-    elif(x.str.contains('Ecuador-Francia')):
-        return 1
-    elif(x.str.contains('Ecuador-Honduras')):
+    list=['Inauguracion Mundial de futbol Brasil','Mundial de futbol Brasil: Ecuador-Francia','Mundial de futbol Brasil: Ecuador-Honduras']
+    if (x in list):
         return 1
     else:
         return 0
+
 
 unitsales['worldcupdrop'] = unitsales.apply(lambda x: worldcupdrop(x['description_n']), axis=1)
 
 def earthquakespike(x):
     list=['Terremoto Manabi+1','Terremoto Manabi+2','Terremoto Manabi+3','Terremoto Manabi+4','Terremoto Manabi+8','Terremoto Manabi+14','Terremoto Manabi+15']
-    if (x.isin(list)):
+    if (x in list):
         return 1
     else:
         return 0
@@ -176,7 +171,7 @@ unitsales['earthquakespike'] = unitsales.apply(lambda x: earthquakespike(x['desc
 
 def earthquakedrop(x):
     list=['Terremoto Manabi+9','Terremoto Manabi+10','Terremoto Manabi+11','Terremoto Manabi+12','Terremoto Manabi+13']
-    if (x.isin(list)):
+    if (x in list):
         return 1
     else:
         return 0
