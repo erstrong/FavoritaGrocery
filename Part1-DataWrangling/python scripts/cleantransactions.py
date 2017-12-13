@@ -65,7 +65,7 @@ flattened['29'] = t29['29']
 
 #36 2013-05
 t36 = flattened[['date','36']]
-t36 = t36[t36['date']>='2013-05-10']
+t36 = t36[t36['date']>='2013-05-09']
 t36['36'] = t36['36'].interpolate(method='linear').bfill().ffill()
 flattened['36'] = t36['36']
 
