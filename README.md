@@ -15,5 +15,9 @@ Note: Because we used Heroku to deploy our web app, we had to create a separate 
 
 App Repository: [https://github.com/erstrong/GroceryFlaskApp](https://github.com/erstrong/GroceryFlaskApp)
 
+## Presentation
+
+SlideShare: [https://www.slideshare.net/EmilyStrong/team-4-presentation-grocery-sales-forecasting](https://www.slideshare.net/EmilyStrong/team-4-presentation-grocery-sales-forecasting)
+
 ## References
 Kaggle Competition:[https://www.kaggle.com/c/favorita-grocery-sales-forecasting](https://www.kaggle.com/c/favorita-grocery-sales-forecasting)
